@@ -11,6 +11,7 @@ while True:
         x = Symbol('x')
 
         transformations = (standard_transformations + (implicit_multiplication_application, convert_xor))
+        print("Press Ctrl + C to quit.")
         print("If you want to use constants 'e' or 'pi', write E * (function) or pi * (function)")
         f = parse_expr(input("Give me an equation: "), transformations=transformations)
 
@@ -68,12 +69,13 @@ while True:
 
     except ValueError or TypeError:
         print("Nah, I can't take that. My circuits say there is more than one variable letter here.")
+        input()
+        os.system('cls' if os.name == 'nt' else 'clear')
 
     except SyntaxError:
         print("You fat-fingered something.")
+        input()
+        os.system('cls' if os.name == 'nt' else 'clear')
 
     except KeyboardInterrupt:
         quit()
-
-
-
