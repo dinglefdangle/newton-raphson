@@ -13,58 +13,39 @@ while True:
         transformations = (standard_transformations + (implicit_multiplication_application, convert_xor))
         print("Press Ctrl + C to quit.")
         print("If you want to use constants 'e' or 'pi', write E * (function) or pi * (function)")
+
         f = parse_expr(input("Give me an equation: "), transformations=transformations)
 
-        fprime = f.diff()
+        if f.is_constant() is True:
+            raise AssertionError
 
+        fprime = f.diff(modules=["sympy"])
+        f = lambdify(x, f, modules=["sympy"])
+        fprime = lambdify(x, fprime, modules=["sympy"])
+        newtons_expr = lambdify(x, x - (f(x) / fprime(x)), modules=["sympy"])
+
+
+
+        def newtons_method(guess, maxiter=15):
+            approx = newtons_expr(guess)
+            if float(Abs(approx - guess)) < 0.001:
+                return approx
+            elif maxiter is 0:
+                raise AssertionError
+            else:
+                return newtons_method(approx, maxiter-1)
 
         try:
-            fprimeprime = fprime.diff()
-            conTest = lambdify(x, Abs((f * fprimeprime) / (fprime) ** 2))
+            print("A close estimate to one of the solutions to your equation: " + str(round(float(newtons_method(1)), 3)))
+            input()
+            os.system('cls' if os.name == 'nt' else 'clear')
 
-            if (conTest(1) > 1) or (f.is_constant() is True):
-                raise AssertionError
-
-        except AssertionError or ZeroDivisionError:
+        except (ZeroDivisionError, AssertionError):
             print('This equation either does not converge using Newton\'s method, or has no solutions.')
             sleep(2)
             os.system('cls' if os.name == 'nt' else 'clear')
 
-        else:
 
-            f = lambdify(x, f)
-            fprime = lambdify(x, fprime)
-
-            newtons_expr = x - (f(x)/fprime(x))
-            newtons_expr = lambdify(x, newtons_expr)
-
-            def newtons_method(guess):
-                approx1 = guess
-                approx2 = float(newtons_expr(approx1))
-                approx = True
-
-                while float(Abs((approx2 - approx1))) > 0.001:
-                    if (approx is True):        #if the approx is True, the program knows to change the value of approx1.
-                        approx1 = newtons_expr(approx2)
-                        approx = False
-                    else:                       #if approx is False, the program knows to change the value of approx2.
-                        approx2 = newtons_expr(approx1)
-                        approx = True
-                else:
-                    if (approx is True):
-                        return approx2          #...because the last value changed would have been approx2 when approx is True
-                    else:
-                        return approx1
-
-            try:
-                print("A close estimate to one of the solutions to your equation: " + str(round(float(newtons_method(1)), 3)))
-                input()
-                os.system('cls' if os.name == 'nt' else 'clear')
-
-            except ZeroDivisionError:
-                print('This equation either does not converge using Newton\'s method, or has no solutions.')
-                sleep(2)
-                os.system('cls' if os.name == 'nt' else 'clear')
 
 
     except ValueError or TypeError:
@@ -74,6 +55,11 @@ while True:
 
     except SyntaxError:
         print("You fat-fingered something.")
+        input()
+        os.system('cls' if os.name == 'nt' else 'clear')
+
+    except AssertionError:
+        print("This equation either does not converge using Newton\'s method, or has no solutions.")
         input()
         os.system('cls' if os.name == 'nt' else 'clear')
 
