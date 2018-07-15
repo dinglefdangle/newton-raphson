@@ -19,10 +19,10 @@ while True:
         if f.is_constant() is True:
             raise AssertionError
 
-        fprime = f.diff(modules=["sympy"])
-        f = lambdify(x, f, modules=["sympy"])
-        fprime = lambdify(x, fprime, modules=["sympy"])
-        newtons_expr = lambdify(x, x - (f(x) / fprime(x)), modules=["sympy"])
+        fprime = f.diff()
+        f = lambdify(x, f)
+        fprime = lambdify(x, fprime)
+        newtons_expr = lambdify(x, x - (f(x) / fprime(x)))
 
 
 
